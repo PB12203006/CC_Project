@@ -1,17 +1,29 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= title %></title>
+    <title>Sign in for LightHouse!</title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
   <body>
-    <h1><%= title %></h1>
-    <p>Welcome to LightHouse!</p>
+    <h1>Welcome to LightHouse</h1>
+    <p><%= title %></p>
     <div>
         <form id="signinForm" name="signinForm" method="post" action="">
-            <input type="username" class="form-control" id="username" placeholder="Username"><br>
-            <input type="password" class="form-control" id="passwd" placeholder="Password"><br>
-            <button type="submit" class="btn" id="login-form-btn" onclick="document.getElementById("signinForm").submit();" >Sign in!</button>
+            <div>
+                <p></p>
+                <label>Username:</label>
+                <input type="text" name="username" placeholder="Username"/>
+            </div>
+            <div>
+                <p></p>
+                <label>Password:</label>
+                <input type="password" name="password" placeholder="********"/>
+            </div>
+            <div>
+                <p></p>
+                <input type="submit" class="btn btn-primary btn-sm" value="Sign in"/>
+                <input type="Reset" class="btn btn-primary btn-sm" value="Reset"/>
+            </div>
         </form>
     </div>
   </body>

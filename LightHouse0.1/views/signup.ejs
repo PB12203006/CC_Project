@@ -1,19 +1,39 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= title %></title>
+    <title>Sign up for LightHouse!</title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
   </head>
   <body>
-    <h1><%= title %></h1>
-    <p>Welcome to LightHouse!</p>
+    <h1>Welcome to LightHouse!</h1>
+    <p><%= title %></p>
     <div>
         <form id="signupForm" name="signupForm" method="post" action="">
-            <input type="username" id="username" placeholder="Username"><br>
-            <input type="email" id="email" placeholder="Email"><br>
-            <input type="password" id="password" placeholder="Password"><br>
-            <input type="number" id="number" placeholder="Phone Number"><br>
-            <button type="submit" id="reg-form-btn" >Sign up!</button>
+            <div>
+                <p></p>
+                <label>New Username:</label>
+                <input type="text" name="username" placeholder="Username"/>
+            </div>
+            <div>
+                <p></p>
+                <label>New Password:</label>
+                <input type="password" name="password" placeholder="********"/>
+            </div>
+            <div>
+                <p></p>
+                <label>Email Address:</label>
+                <input type="email" name="email" placeholder="Email Address"/>
+            </div>
+            <div>
+                <p></p>
+                <label>Phone Number:</label>
+                <input type="number" name="number" placeholder="Phone Number"/>
+            </div>
+            <div>
+                <p></p>
+                <input type="submit" class="btn btn-primary btn-sm" value="Sign me up!"/>
+                <input type="Reset" class="btn btn-primary btn-sm" value="Reset"/>
+            </div>
         </form>
     </div>
   </body>
