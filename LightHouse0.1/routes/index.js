@@ -3,19 +3,10 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/lighthouse', function(req, res, next) {
-  res.render('lighthouse', { title: 'LightHouse' });
+  res.render('lighthouse',{title: req.body.username});
 });
-           
-/* Get Userlist page */
-router.get('/userlist', function(req,res){
-  var db = req.db;
-  var collection = db.get('usercollection');
-  collection.find({},{},function(e,docs){
-      res.render('userlist',{
-          "userlist" : docs
-      });
-  });
-});           
+   
+//router.post('/lighthouse', function)                
 
 /* Sign in*/                             
 router.get('/signin', function(req, res) {
@@ -51,7 +42,7 @@ router.post('/signin', function(req, res){
             //deferred.resolve(result);
           } else {
             console.log("AUTHENTICATION FAILED");
-            res.render("signin", { title: 'Wrong username or password. please Sign in again, LH.' });
+            res.render("signin", { title: 'Wrong username or password. please Sign in again.'});
             //deferred.resolve(false);
           }
         }
@@ -60,24 +51,7 @@ router.post('/signin', function(req, res){
       });
     });
 
-  
-  
-  //Submit to the DB
-  //collection.insert({
-  //    "username" : userName,
-  //    "email" : userEmail
-  //}, function(err,doc){
-  //    if (err){
-          //If it failed, return error
- //         res.send("There was a problem adding the information to the database.");
- //     }
- //     else {
-          //And forward to success page
- //         res.redirect("signin");
- //     }
-  //}); 
-//});
-                     
+           
            
 /* GET New User page. */
 router.get('/signup', function(req, res) {
@@ -85,22 +59,7 @@ router.get('/signup', function(req, res) {
 });
 
 
-/* POST to Add User Service */
-router.post('/signu', function (req, res, next) {
-    var user = {
-       Name: req.body.username,
-       Email: req.body.email,
-       Pass: req.body.password,
-       Num: req.body.number
-   };
-   var UserReg = mongoose.model('UserReg', RegSchema);
-   UserReg.create(user, function(err, newUser) {
-      if(err) return next(err);
-      req.session.user = email;
-      return res.send('Logged In!');
-   });
-});
-                  
+/* POST to Add User Service */              
 router.post('/signup', function(req, res){
   //Set our internal DB variable
   var db = req.db;
@@ -110,9 +69,11 @@ router.post('/signup', function(req, res){
   var userEmail = req.body.email;
   var userpw = req.body.password;
   var usernum = req.body.number;
+  var sampleFile = req.files.sampleFile;
   
   //Set our collection
   var collection = db.get('usercollection');
+  
   
   //check if username is already assigned in our database
     collection.findOne({'username' : userName})
@@ -128,7 +89,8 @@ router.post('/signup', function(req, res){
                      "username" : userName,
                       "email" : userEmail,
                       "password" : userpw,
-                      "number" : usernum
+                      "number" : usernum,
+                      "file": sampleFile
             //"avatar": "http://placepuppy.it/images/homepage/Beagle_puppy_6_weeks.JPG"
           }
           console.log("REQ.BODY", req.body)
@@ -142,29 +104,43 @@ router.post('/signup', function(req, res){
           }
           else {
               //And forward to success page
+              console.log('File uploaded!');
               res.redirect("signin");
           }
         });
       }
   });
+  console.log("upload file: ",sampleFile); // the uploaded file object 
 });
                   
-  //Submit to the DB
-  //collection.insert({
- //     "username" : userName,
- //     "email" : userEmail,
- //     "password" : userpw,
- //     "number" : usernum
-  //}, function(err,doc){
-  //    if (err){
-          //If it failed, return error
- //         res.send("There was a problem adding the information to the database.");
- //     }
- //     else {
-          //And forward to success page
- //         res.redirect("signin");
- //     }
- // });
-//});
-                     
+/* Test web for upload files to MongoDB*/                            
+router.get('/upload', function(req, res) {
+    res.render('upload', { title: 'Upload file to LightHouse!' });
+});
+           
+router.post('/upload', function(req, res) {
+    if (!req.files)
+      return res.status(400).send('No files were uploaded.');
+
+    // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file 
+    let sampleFile = req.files.sampleFile;
+
+    // Use the mv() method to place the file somewhere on your server
+    var db = req.db;
+    var collection = db.get('usercollection');
+    collection.insert({"file":sampleFile},
+          function(err,doc){
+          if (err){
+              //If it failed, return error
+              console.log("There was a problem adding the samplefile to the database.");
+          }
+          else {
+              //And forward to success page
+              console.log('File uploaded!');
+              res.redirect("lighthouse");
+          }
+    });
+    console.log("upload file: ",sampleFile); // the uploaded file object 
+});
+         
 module.exports = router;

@@ -8,7 +8,7 @@
     <h1>Welcome to LightHouse!</h1>
     <p><%= title %></p>
     <div>
-        <form id="signupForm" name="signupForm" method="post" action="">
+        <form id="signupForm" name="signupForm" method="post" action="" encType="multipart/form-data">
             <div>
                 <p></p>
                 <label>New Username:</label>
@@ -31,10 +31,17 @@
             </div>
             <div>
                 <p></p>
+                <label>Upload Profile Photo:</label>
+                <input type="file" name="sampleFile"/>
+            </div>
+            <div>
+                <p></p>
                 <input type="submit" class="btn btn-primary btn-sm" value="Sign me up!"/>
                 <input type="Reset" class="btn btn-primary btn-sm" value="Reset"/>
             </div>
         </form>
+    </div>
+    <div>
     </div>
   </body>
 </html>

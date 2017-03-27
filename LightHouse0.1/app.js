@@ -10,6 +10,7 @@ var mongo = require('mongodb');
 var monk = require('monk');
 //var mongoose = require('mongoose');
 var db = monk('localhost:27017/lighthouse');
+var fileUpload = require('express-fileupload');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
@@ -27,6 +28,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(fileUpload());
 
 //Make our db accessible to our router
 app.use(function(req,res,next){
