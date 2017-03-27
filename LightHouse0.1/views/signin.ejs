@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1><%= title %></h1>
+    <p>Welcome to LightHouse!</p>
+    <div>
+        <form id="signinForm" name="signinForm" method="post" action="">
+            <input type="username" class="form-control" id="username" placeholder="Username"><br>
+            <input type="password" class="form-control" id="passwd" placeholder="Password"><br>
+            <button type="submit" class="btn" id="login-form-btn" onclick="document.getElementById("signinForm").submit();" >Sign in!</button>
+        </form>
+    </div>
+  </body>
+</html>
