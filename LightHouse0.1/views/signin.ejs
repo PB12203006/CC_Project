@@ -7,24 +7,32 @@
   <body>
     <h1>Welcome to LightHouse</h1>
     <p><%= title %></p>
-    <div>
+    <div class="uinput">
         <form id="signinForm" name="signinForm" method="post" action="">
-            <div>
-                <p></p>
+            
+
                 <label>Username:</label>
-                <input type="text" name="username" placeholder="Username"/>
-            </div>
-            <div>
-                <p></p>
+                <br />
+                <input type="text" name="username" placeholder="Username"/ style="width: 350px;">
+            <br />
+            
+
                 <label>Password:</label>
-                <input type="password" name="password" placeholder="********"/>
-            </div>
-            <div>
-                <p></p>
+                <br />
+                <input type="password" name="password" placeholder="********"/ style="width: 350px;">
+            <br />
+            
+            <div class="signup">
                 <input type="submit" class="btn btn-primary btn-sm" value="Sign in"/>
                 <input type="Reset" class="btn btn-primary btn-sm" value="Reset"/>
             </div>
+
+            
         </form>
+
+        <div class="b1">
+            <p><font size="4">New to LightHouse? Sign up <a href="./signup">here</a>!</font></p>
+        </div>
     </div>
   </body>
 </html>
