@@ -6,6 +6,7 @@ router.get('/lighthouse', function(req, res, next) {
   res.render('lighthouse',{title: req.body.username});
 });
    
+//router.post('/lighthouse', function)                
 
 /* Sign in*/                             
 router.get('/signin', function(req, res) {
@@ -37,7 +38,11 @@ router.post('/signin', function(req, res){
           console.log("FOUND USER: " + result.username);
           //bcrypt.compareSync(userpw, hash)
           if (userpw == result.password) {
-            res.redirect("lighthouse");
+            var image = Buffer.from(result.file.data.buffer,'binary').toString('base64');
+            var type = result.file.mimetype;
+            console.log(result.file);
+            res.render("lighthouse",{title:result.username, img: image, tp: type});
+          
             //deferred.resolve(result);
           } else {
             console.log("AUTHENTICATION FAILED");
@@ -83,11 +88,6 @@ router.post('/signup', function(req, res){
           //deferred.resolve(false); // username exists
         }
         else  {
-          if (/image/.exec(sampleFile.mimetype)==null){
-            console.log("MimeType of the file:" , sampleFile.mimetype);
-            res.render('signup', {title:'Please upload a image.'})
-          }
-          else{
           //var hash = bcrypt.hashSync(userpw, 8);
           var user = {
                      "username" : userName,
@@ -112,8 +112,7 @@ router.post('/signup', function(req, res){
               res.redirect("signin");
           }
         });
-        }
-       }
+      }
   });
   console.log("upload file: ",sampleFile); // the uploaded file object 
 });
@@ -129,14 +128,7 @@ router.post('/upload', function(req, res) {
 
     // The name of the input field (i.e. "sampleFile") is used to retrieve the uploaded file 
     let sampleFile = req.files.sampleFile;
-    
-    // Check if the file is a image
-    //var regex = new RegExp("image")
-    if (/image/.exec(sampleFile.mimetype)==null){
-        console.log("MimeType of the file:" , sampleFile.mimetype);
-        res.render('upload', {title:'Please upload a image.'})
-    }
-    else{
+
     // Use the mv() method to place the file somewhere on your server
     var db = req.db;
     var collection = db.get('usercollection');
@@ -149,11 +141,10 @@ router.post('/upload', function(req, res) {
           else {
               //And forward to success page
               console.log('File uploaded!');
-              res.render("lighthouse", req);
+              res.redirect("lighthouse");
           }
     });
-    console.log("upload file: ",req); // the uploaded file object 
-    }
+    console.log("upload file: ",sampleFile); // the uploaded file object 
 });
          
 module.exports = router;
