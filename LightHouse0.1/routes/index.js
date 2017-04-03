@@ -38,7 +38,11 @@ router.post('/signin', function(req, res){
           console.log("FOUND USER: " + result.username);
           //bcrypt.compareSync(userpw, hash)
           if (userpw == result.password) {
-            res.redirect("lighthouse");
+            var image = Buffer.from(result.file.data.buffer,'binary').toString('base64');
+            var type = result.file.mimetype;
+            console.log(result.file);
+            res.render("lighthouse",{title:result.username, img: image, tp: type});
+          
             //deferred.resolve(result);
           } else {
             console.log("AUTHENTICATION FAILED");
