@@ -71,6 +71,10 @@ router.get('/signup', function(req, res) {
     res.render('signup', { title: 'Sign up for LightHouse!' });
 });
 
+router.get('/prate', function(req, res) {
+    res.render('prate');
+});
+
 
 /* POST to Add User Service */              
 router.post('/signup', function(req, res){

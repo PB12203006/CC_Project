@@ -1,0 +1,62 @@
+<html>
+    
+        <head>
+            <title>What's up</title>
+            <style>
+                .title {
+                    text-align: center;
+                    position: relative;
+                    top: 60px;
+                }
+            
+                .photo {
+                    position: relative;
+                    display: block;
+                    margin-left: auto;
+                    margin-right: auto;
+                    top: 70px;
+                }
+                .tb2 {
+                    position: absolute;
+                    bottom: 10px;
+                    left:10%;
+                    right:10%;
+                }
+            </style>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js">
+        </script>
+        
+        <script>
+            url = "https://api.flickr.com/services/rest/?method=flickr.photos.getRecent&api_key=***REMOVED***&format=json&nojsoncallback=1";
+            var pc = '';
+            $.getJSON(url, function(json){
+                console.log(json.photos.photo[0]);
+                proto=json.photos.photo[0];
+                var farm = proto.farm;
+                var server = proto.server;
+                var id = proto.id;
+                var secret =proto.secret;
+                var ustring = "https://farm" + farm + ".staticflickr.com/" + server +"/" + id+"_"+secret+".jpg";
+                //https://farm{farm-id}.staticflickr.com/{server-id}/{id}_{secret}.jpg
+                var pic = ustring;
+                var pc = "";
+                pc = '<img width=450 class="photo" src='+pic+'>';
+                $("#results").append(pc);
+            });
+        </script>
+        </head>
+        
+    
+    <body>
+        <h1 class="title">WHAT'S UP?</h1>
+        <div id="results"></div>
+        <table width="100%" border=0 class="tb2">
+        <tr>
+            <td><img width="50" src='https://tctechcrunch2011.files.wordpress.com/2016/02/haha.png'></td>
+            <td><img width="50" src='https://tctechcrunch2011.files.wordpress.com/2016/02/wow.png'></td>
+            <td><img width="50" src='https://tctechcrunch2011.files.wordpress.com/2016/02/sad.png'></td>
+            <td><img width="50" src='https://tctechcrunch2011.files.wordpress.com/2016/02/angry.png'></td>
+        </tr>
+        </table>
+    </body>
+</html>
