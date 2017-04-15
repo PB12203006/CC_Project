@@ -5,6 +5,9 @@ var fs = require('fs');
 var aws = require('aws-sdk');
 var path = require('path');
 var data={};  //global variable to transfer user info
+var AWS = require('aws-sdk');
+AWS.config.update({region:'us-east-1'});
+var sqs = new AWS.SQS();
  
 /* GET home page. */
 router.get('/lighthouse', function(req, res, next) {
@@ -223,9 +226,38 @@ router.post('/download', function(req, res, next){
 });
 
 router.get('/feedback', function(req, res){
-    console.log('got it')
-    console.log(req.query.f)
+  var feedback=req.query.f;
+
+  console.log(typeof feedback);
+  var db=req.db;
+  var collection=db.get('userfeedback');
+  var fb={
+    'feedback':feedback
+  };
+  //to mongodb
+  collection.insert(fb,function(err,doc){
+    if (err){
+      console.log("There was a problem adding the information to the database.");
+    }
+    else {
+    console.log('updated!');
+    }
+  });
+  //to s3
+  var params={
+    MessageBody: 'feedback', /* required */
+    QueueUrl: 'https://sqs.us-east-1.amazonaws.com/145842502534/lighthousefeedback', /* required */
+    MessageAttributes: {
+      "feedback": {
+      DataType: "String", 
+      StringValue: feedback
+      } 
+    }
+  };
+  sqs.sendMessage(params, function(err, data) {
+    if (err) console.log(err, err.stack); // an error occurred
+    else     console.log(data);           // successful response
+  });
 });
 
-//
 module.exports = router;
