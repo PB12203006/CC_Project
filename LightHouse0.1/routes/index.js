@@ -222,5 +222,10 @@ router.post('/download', function(req, res, next){
  
 });
 
+router.get('/feedback', function(req, res){
+    console.log('got it')
+    console.log(req.query.f)
+});
+
 //
 module.exports = router;
