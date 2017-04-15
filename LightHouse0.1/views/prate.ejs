@@ -5,7 +5,7 @@
                 .title {
                     text-align: center;
                     position: relative;
-                    top: 60px;
+                    top: 40px;
                 }
             
                 .photo {
@@ -15,17 +15,30 @@
                     margin-right: auto;
                     top: 70px;
                 }
+                
+                .r_image{
+                    position: relative;
+                    display: block;
+                    margin-left: auto;
+                    margin-right: auto;
+                    height:170px
+                    width:auto;/*maintain aspect ratio*/
+                    max-width:340px;
+                }
                 .tb2 {
                     position: absolute;
                     bottom: 10px;
-                    left:10%;
-                    right:10%;
+                    left: 0; 
+                    right: 0; 
+                    margin-left: auto; 
+                    margin-right: auto; 
+                    width: 300px;
                 }
             </style>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js">
         </script>
         <script>
-            url = "https://api.flickr.com/services/rest/?method=flickr.photos.getRecent&api_key=***REMOVED***&format=json&nojsoncallback=1";
+            url = "https://api.flickr.com/services/rest/?method=flickr.interestingness.getList&api_key=1c936e8503de8fdcb92c1d12a926317a&format=json&nojsoncallback=1&auth_token=72157679322682244-d44de60ce6d23987&api_sig=242c22d523233478e2dfa77ae09bbbdd";
             var pc = '';
             var data;
             var ind=0;
@@ -59,6 +72,7 @@
                 var pc = "";
                 pc = '<img width=450 class="photo" src='+pic+'>';
                 console.log(pc);
+                $("#results").empty();
                 $("#results").append(pc);
             }
             function feedback(){
@@ -76,15 +90,25 @@
     <body>
         <h1 class="title">WHAT'S UP?</h1>
         <div id="results"></div>
+        <div class = "tb2">
+        <table align="center">
         <form>
-            <br>
+            <tr>
+            <td>
             <input type="radio" id="like" name="img" value="1" />
             <label for="like">Like</label>
+            </td>
+            <td>
             <input type="radio" id="dislike" name="img" value="-1" />
             <label for="dislike">Dislike</label>
-            <br>
+            </td>
+            <td>
             <input id="fb" type="button" value="Submit" onclick="feedback();"/>
+            </td>
+            </tr>
         </form>
+        </table>
+        </div>
         <!--
         <table width="100%" border=0 class="tb2">
         <tr>
