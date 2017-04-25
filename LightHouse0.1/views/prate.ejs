@@ -1,76 +1,85 @@
 <html>
-        <head>
-            <title>What's up</title>
-            <style>
-                .title {
-                    text-align: center;
-                    position: relative;
-                    top: 40px;
-                }
-            
-                .photo {
-                    position: relative;
-                    display: block;
-                    margin-left: auto;
-                    margin-right: auto;
-                    top: 70px;
-                }
-                
-                .r_image{
-                    position: relative;
-                    display: block;
-                    margin-left: auto;
-                    margin-right: auto;
-                    height:170px
-                    width:auto;/*maintain aspect ratio*/
-                    max-width:340px;
-                }
-                .tb2 {
-                    position: absolute;
-                    bottom: 10px;
-                    left: 0; 
-                    right: 0; 
-                    margin-left: auto; 
-                    margin-right: auto; 
-                    width: 300px;
-                }
-            </style>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js">
-        </script>
-        <script>
-            url = "https://api.flickr.com/services/rest/?method=flickr.interestingness.getList&api_key=1c936e8503de8fdcb92c1d12a926317a&format=json&nojsoncallback=1&auth_token=72157679322682244-d44de60ce6d23987&api_sig=242c22d523233478e2dfa77ae09bbbdd";
-            var pc = '';
-            var data;
-            var ind=0;
+<head>
+    <title>What's up</title>
+    <style>
+    
+    
+    
+    body {
+      
+      background: url("https://zellox.com/wp-content/uploads/2016/05/website-backgrounds-%E2%80%AB1%E2%80%AC-%E2%80%AB%E2%80%AC.jpg") no-repeat center center fixed; 
+      background-size: cover;
+    }
+    .title {
+        
+        font-size: 4em;
+        text-align: center;
+        border: 3px solid red;
+    }
+
+    .photo {
+        text-align: center;
+    }
+    
+    .phtot img{
+        display: inline-block;
+    }
+
+ .tb2 {
+    position: relative;
+    top: 60px;
+
+    margin-left: auto; 
+    margin-right: auto; 
+    width: 300px;
+}
+.cc-selector input{
+    margin:0;padding:0;
+    -webkit-appearance:none;
+       -moz-appearance:none;
+            appearance:none;
+}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js">
+</script>
+<script>
+url = "https://api.flickr.com/services/rest/?method=flickr.interestingness.getList&api_key=70c8af8f150221737b7487a43a27aebd&format=json&nojsoncallback=1&auth_token=72157683055072415-eba2af58104cd97a&api_sig=e495da075e4a0d58dc6e0bab8cff4e2e";
+var pc = '';
+var data;
+var ind=0;
+function getImageUrl (photo, format) {
+	return "https://farm" + photo.farm + ".static.flickr.com/" + photo.server + "/" + photo.id + "_" + photo.secret + format + ".jpg";
+}
+
+// handy function to retrieve the original photo if available
+function getOriginalImageUrl (photo) {
+	return "https://farm" + photo.farm + ".static.flickr.com/" + photo.server + "/" + photo.id + "_" + photo.originalsecret + "_" + "o."+photo.originalformat;
+}
+
+// get the image url according to its best size
+// If one of the side is greater than 1280 then a large (_b) version is created
+function getBestImageUrl(photo) {
+    if(photo.o_width)
+    {
+        if (photo.o_width > 1280 || photo.o_height > 1280)
+        	return getImageUrl(photo, '_b');
+        return getOriginalImageUrl(photo);
+    }
+    return getImageUrl(photo, '');
+}
+
             $.getJSON(url, function(json){
                 console.log(json.photos.photo[0]);
                 data=json.photos.photo;
-                /*
-                proto=json.photos.photo[0];
-                var farm = proto.farm;
-                var server = proto.server;
-                var id = proto.id;
-                var secret =proto.secret;
-                var ustring = "https://farm" + farm + ".staticflickr.com/" + server +"/" + id+"_"+secret+".jpg";
-                //https://farm{farm-id}.staticflickr.com/{server-id}/{id}_{secret}.jpg
-                var pic = ustring;
-                var pc = "";
-                pc = '<img width=450 class="photo" src='+pic+'>';
-                $("#results").append(pc);
-                */
                 display(0)
             });
             function display(index){
                 var proto = data[index];
-                var farm = proto.farm;
-                var server = proto.server;
-                var id = proto.id;
-                var secret =proto.secret;
-                var ustring = "https://farm" + farm + ".staticflickr.com/" + server +"/" + id+"_"+secret+".jpg";
+                var ustring = getBestImageUrl(proto);//"https://farm" + farm + ".staticflickr.com/" + server +"/" + id+"_"+secret+".jpg";
                 //https://farm{farm-id}.staticflickr.com/{server-id}/{id}_{secret}.jpg
                 var pic = ustring;
                 var pc = "";
-                pc = '<img width=450 class="photo" src='+pic+'>';
+                pc = '<img src='+pic+'>';
                 console.log(pc);
                 $("#results").empty();
                 $("#results").append(pc);
@@ -85,30 +94,33 @@
                 console.log(ind);
                 display(ind);
             }
-        </script>
+            </script>
         </head>
-    <body>
-        <h1 class="title">WHAT'S UP?</h1>
-        <div id="results"></div>
-        <div class = "tb2">
-        <table align="center">
-        <form>
-            <tr>
-            <td>
-            <input type="radio" id="like" name="img" value="1" />
-            <label for="like">Like</label>
-            </td>
-            <td>
-            <input type="radio" id="dislike" name="img" value="-1" />
-            <label for="dislike">Dislike</label>
-            </td>
-            <td>
-            <input id="fb" type="button" value="Submit" onclick="feedback();"/>
-            </td>
-            </tr>
-        </form>
-        </table>
-        </div>
+        <body>
+            <h1 class="title">WHAT'S UP?</h1>
+            <div id="results" class="photo"></div>
+            <div class = "tb2">
+                <table align="center">
+                    <form>
+                        <tr>
+                            
+                            <td>
+                                <label for="like" class="cc-selector">
+                                    <input type="radio" id="like" name="img" value="1" onclick="feedback();"/>
+                                    <img src="https://cdn.worldvectorlogo.com/logos/facebook-haha.svg" height="42" width="42">
+                                </label>
+                            </td>
+                            <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                            <td>
+                                <label for="dislike" class="cc-selector">
+                                    <input type="radio" id="dislike" name="img" value="-1" onclick="feedback();"/ >
+                                    <img src="https://cdn.worldvectorlogo.com/logos/facebook-angry.svg" height="42" width="42">
+                                </label>
+                            </td>
+                        </tr>
+                    </form>
+                </table>
+            </div>
         <!--
         <table width="100%" border=0 class="tb2">
         <tr>
@@ -118,9 +130,9 @@
             <td><img width="50" src='https://tctechcrunch2011.files.wordpress.com/2016/02/angry.png'></td>
         </tr>
         </table>
-        -->
-        <script type=text/javascript>
-            $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-        </script>
-    </body>
+    -->
+    <script type=text/javascript>
+    $SCRIPT_ROOT = {{ request.script_root|tojson|safe }}
+    </script>
+</body>
 </html>
