@@ -12,6 +12,7 @@ a {
 .uinput {
     	position: relative;
     	line-height: 160%;
+	border-style: inset;
 }
 .signup {
     	position: relative;
