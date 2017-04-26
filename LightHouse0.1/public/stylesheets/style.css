@@ -15,6 +15,7 @@ a {
 }
 .binput{
 	border-style: inset;
+	border-width: 15px;
 }
 .signup {
     	position: relative;
