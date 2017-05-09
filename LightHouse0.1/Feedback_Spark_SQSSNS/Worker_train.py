@@ -15,14 +15,15 @@ from perceptron import PerceptronforRDD
 #import tweet_utils
 #import notify2es
 
+
 # Use API to get sentiment analysis, which can analyze a limit number of tweets per day. Switch to tweet_utils analysis instead.
 #from watson_developer_cloud import AlchemyLanguageV1
 #alchemy_language = AlchemyLanguageV1(api_key='c0200c7c4dc55546016f0dba32ffdc9f58607060')
 
 class workerthread():
     def __init__(self, hashingTF, spark):
-        self.client_sns = boto3.client('sns')
-        self.sns_arn = 'arn:aws:sns:us-west-2:560376101737:Flickr-feed'
+        #self.client_sns = boto3.client('sns')
+        #self.sns_arn = 'arn:aws:sns:us-west-2:560376101737:Flickr-feed'
         self.hashingTF = hashingTF
         self.spark = spark
         #self.mongodb = mongodb
@@ -47,22 +48,23 @@ class workerthread():
             messages = sc.parallelize(messages)
             tags = messages.map(lambda x: x["tags"].split(" "),preservesPartitioning=True)
             labels = messages.map(lambda x: x["label"],preservesPartitioning=True)
-            links = messages.map(lambda x: x["url"],preservesPartitioning=True)
+            #links = messages.map(lambda x: x["url"],preservesPartitioning=True)
             tf = self.hashingTF.transform(tags)
             #train = tf.zip(messages).map(lambda x: {"tf":x[0],"label":x[1]["label"]})
             model.perceptronBatch(data=tf,labels=labels,MaxItr=10)
             model.save("models/"+user+".json",average=True)
             #test = tf.zip(messages).map(lambda x:{"tf":x[0],"link":x[1]["url"]})
             print "save_path:","models/"+user+".json"
-            predict = model.predictPositive(tf,links)
-            prediction = predict.map(lambda x:x[1]).collect()
-            positive = {"user":user,"links":prediction}
+            predict = model.predict(tf)
+            print predict.collect()
+            #prediction = predict.map(lambda x:x[1]).collect()
+            #positive = {"user":user,"links":prediction}
             #print "predict label", predict.collect()
             #mongodb.write.format("com.mongodb.spark.sql.DefaultSource").mode("overwrite").option("database", \
             #                        "test").option("collection", "colllabeled").save()
-            print json.dumps(positive, indent=4)
-            self.client_sns.publish(TopicArn=self.sns_arn, Message=json.dumps(positive), Subject='Flickr')
-            print 'message pushed'
+            #print json.dumps(positive, indent=4)
+            #self.client_sns.publish(TopicArn=self.sns_arn, Message=json.dumps(positive), Subject='Flickr')
+            #print 'message pushed'
         except Exception, e:
             print messages
             print "Exception ERROR:",e
