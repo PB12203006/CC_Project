@@ -7,12 +7,6 @@
  - Underscore (because it's cool)
  - Socket.IO
 
- It is a common practice to name the variables after the module name.
- Ex: http is the "http" module, express is the "express" module, etc.
- The only exception is Underscore, where we use, conveniently, an
- underscore. Oh, and "socket.io" is simply called io. Seriously, the
- rest should be named after its module name.
-
  */
 var express = require("express")
   , app = express()
@@ -34,7 +28,7 @@ var messages=[]
 /* Server config */
 
 //Server's IP address
-app.set("ipaddr", "127.0.0.1");
+app.set("ipaddr", "0.0.0.0");
 
 //Server's port number
 app.set("port", 8080);
