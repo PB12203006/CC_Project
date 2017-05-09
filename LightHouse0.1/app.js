@@ -39,7 +39,7 @@ app.set('view engine', 'ejs');
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-
+app.use(session({secret: 'secret',saveUninitialized: true,resave: true}));
 
 //
 app.get('/config', function(request, response) {
@@ -55,7 +55,8 @@ app.get('/config', function(request, response) {
 });
 
 app.get('/token', function(request, response) {
-    console.log(`token identity: ${'Kingsley'}`)
+    console.log(request.session.user);
+    console.log(`token identity: ${request.session.user}`)
 
     // Create an access token which we will sign and return to the client
     var token = new AccessToken(
@@ -65,7 +66,7 @@ app.get('/token', function(request, response) {
     );
 
     // Assign the generated identity to the token
-    token.identity = 'Kingsley';//randomUsername();
+    token.identity = request.session.user;//randomUsername();
     //grant the access token Twilio Video capabilities
     if (process.env.TWILIO_CONFIGURATION_SID) {
         var videoGrant = new VideoGrant({
