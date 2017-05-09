@@ -14,7 +14,6 @@ var VideoGrant = AccessToken.VideoGrant;
 var IpMessagingGrant = AccessToken.IpMessagingGrant;
 var SyncGrant = AccessToken.SyncGrant;
 require('dotenv').load();
-var randomUsername = require('./randos');
 
 
 //New Code
