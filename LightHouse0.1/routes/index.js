@@ -8,8 +8,11 @@ var AWS = require('aws-sdk');
 AWS.config.update({region:'us-east-1'});
 var sqs = new AWS.SQS();
 var session = require('express-session');
- 
-
+var es = require('elasticsearch');
+var connection_str='https://***REMOVED***.us-east-1.es.amazonaws.com';
+var client = new es.Client({
+  host:'https://***REMOVED***'
+});
 
 var Clarifai = require('clarifai');
 var Clarifai_app = new Clarifai.App(
@@ -158,6 +161,7 @@ router.post('/signup', function(req, res){
           function(err,doc){
           if (err){
               //If it failed, return error
+              console.log(err,err.stack);
               res.send("There was a problem adding the information to the database.");
           }
           else {
@@ -170,8 +174,7 @@ router.post('/signup', function(req, res){
        }
   });
   console.log("upload file: ",sampleFile); // the uploaded file object 
-});
-                  
+});               
 
 //s3
 /* Multer set storage location*/
@@ -258,6 +261,34 @@ router.post('/download', function(req, res, next){
  
 });
 
+router.get('/rec',function(req,res){
+  res.render('rec');
+});
+
+router.get('/recimg',function(req,res){
+ // console.log(req.session.user);
+  var s_params={
+    index:'tweets',
+    type:'Health_like',
+    size:5,
+    body:{
+      query:{
+        match_all:{}
+      }
+    }
+  };
+  client.search(s_params,function(err,data){
+    if(err){
+      console.log(err);
+    }
+    else{
+      console.log(data['hits']['hits']);
+    }
+  });
+  //j={'a':'1','b':'2','c':'3'};
+  j=[1,2,3];
+  res.send(j);
+});
 
 router.get('/feedback', function(req, res){
   var feedback=req.query.f;
@@ -340,10 +371,7 @@ router.get('/feedback', function(req, res){
     }
   });
 */
-  
-  //to s3
-
-  
+//to s3  
 });
 
 module.exports = router;
