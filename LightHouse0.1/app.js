@@ -4,6 +4,18 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var http = require('http');
+var pug = require('pug');
+
+// Chatroom dependency
+var Twilio = require('twilio');
+var AccessToken = Twilio.jwt.AccessToken;
+var VideoGrant = AccessToken.VideoGrant;
+var IpMessagingGrant = AccessToken.IpMessagingGrant;
+var SyncGrant = AccessToken.SyncGrant;
+require('dotenv').load();
+var randomUsername = require('./randos');
+
 
 //New Code
 var mongo = require('mongodb');
@@ -16,6 +28,7 @@ var index = require('./routes/index');
 var users = require('./routes/users');
 var session = require('express-session');
 var app = express();
+var chatname = index.chatname;
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -27,6 +40,133 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+
+//
+app.get('/config', function(request, response) {
+  response.json( {
+    TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID,
+    TWILIO_NOTIFICATION_SERVICE_SID: process.env.TWILIO_NOTIFICATION_SERVICE_SID,
+    TWILIO_API_KEY: process.env.TWILIO_API_KEY,
+    TWILIO_API_SECRET: process.env.TWILIO_API_SECRET != '',
+    TWILIO_CHAT_SERVICE_SID: process.env.TWILIO_CHAT_SERVICE_SID,
+    TWILIO_SYNC_SERVICE_SID: process.env.TWILIO_SYNC_SERVICE_SID,
+    TWILIO_CONFIGURATION_SID: process.env.TWILIO_CONFIGURATION_SID
+  });
+});
+
+app.get('/token', function(request, response) {
+    console.log(`token identity: ${'Kingsley'}`)
+
+    // Create an access token which we will sign and return to the client
+    var token = new AccessToken(
+        process.env.TWILIO_ACCOUNT_SID,
+        process.env.TWILIO_API_KEY,
+        process.env.TWILIO_API_SECRET
+    );
+
+    // Assign the generated identity to the token
+    token.identity = 'Kingsley';//randomUsername();
+    //grant the access token Twilio Video capabilities
+    if (process.env.TWILIO_CONFIGURATION_SID) {
+        var videoGrant = new VideoGrant({
+          room: 'default room'
+        });
+
+        token.addGrant(videoGrant);
+    }
+
+    if (process.env.TWILIO_CHAT_SERVICE_SID) {
+        // Create a unique ID for the client on their current device
+        var appName = 'TwilioChatDemo';
+        // Create a "grant" which enables a client to use IPM as a given user,
+        // on a given device
+        var ipmGrant = new IpMessagingGrant({
+            serviceSid: process.env.TWILIO_CHAT_SERVICE_SID
+        });
+        token.addGrant(ipmGrant);
+    }
+
+    if (process.env.TWILIO_SYNC_SERVICE_SID) {
+        // Create a unique ID for the client on their current device
+        var appName = 'TwilioSyncDemo';
+
+        // Create a "grant" which enables a client to use Sync as a given user,
+        // on a given device
+        var syncGrant = new SyncGrant({
+            serviceSid: process.env.TWILIO_SYNC_SERVICE_SID
+        });
+        token.addGrant(syncGrant);
+    }
+
+    // Serialize the token to a JWT string and include it in a JSON response
+    response.send({
+        identity: token.identity,
+        token: token.toJwt()
+    });
+});
+app.post('/register', function(request, response) {
+
+  // Authenticate with Twilio
+var client = new Twilio(process.env.TWILIO_API_KEY,  process.env.TWILIO_API_SECRET, null, {accountSid:process.env.TWILIO_ACCOUNT_SID});
+
+  // Get a reference to the user notification service instance
+  var service = client.notify.v1.services(process.env.TWILIO_NOTIFICATION_SERVICE_SID);
+
+  service.bindings.create({
+    "endpoint": request.body.endpoint,
+    "identity": request.body.identity,
+    "bindingType": request.body.BindingType,
+    "address": request.body.Address
+  }).then(function(binding) {
+    var message = 'Binding created!';
+    console.log(binding);
+    // Send a JSON response indicating success
+    response.send({
+      message: message
+    });
+  }).catch(function(error) {
+    var message = 'Failed to create binding: ' + error;
+    console.log(message);
+
+    // Send a JSON response indicating an internal server error
+    response.status(500).send({
+      error: error,
+      message: message
+    });
+  });
+});
+app.post('/send-notification', function(request, response) {
+
+  // Authenticate with Twilio
+  var client = new Twilio(process.env.TWILIO_API_KEY,  process.env.TWILIO_API_SECRET, null, {accountSid:process.env.TWILIO_ACCOUNT_SID});
+
+  // Create a reference to the user notification service
+  var service = client.notify.v1.services(process.env.TWILIO_NOTIFICATION_SERVICE_SID);
+
+  // Send a notification
+  service.notifications.create({
+    'identity':'' + request.body.identity,
+    'body':'Hello, ' + request.body.identity + '!'
+  }).then(function(message) {
+    console.log(message);
+    response.send({
+      message:'Successful sending notification'
+    });
+  }).catch(function(error) {
+    var message = 'Failed to send notification: ' + error;
+    console.log(message);
+    // Send a JSON response indicating an internal server error
+    response.status(500).send({
+      error: error,
+    });
+  });
+});
+var server = http.createServer(app);
+var port = process.env.PORT || 3002;
+server.listen(port, function() {
+    console.log('Express server running on *:' + port);
+});
+//
 
 //test session
 app.use(session({
@@ -59,6 +199,7 @@ app.use(function(req,res,next){
 
 app.use('/', index);
 app.use('/users', users);
+
 
 app.get("/", function(req, res){
     var title="Welcome";
