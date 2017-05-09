@@ -36,7 +36,7 @@ es = Elasticsearch(
 
 class workerthread():
     def __init__(self, hashingTF, spark):
-        #self.client_sns = boto3.client('sns')
+        self.sqs = boto3.resource('sqs')#self.client_sns = boto3.client('sns')
         #self.sns_arn = 'arn:aws:sns:us-west-2:560376101737:Pixabay-feed'
         self.hashingTF = hashingTF
         self.spark = spark
@@ -97,7 +97,11 @@ class workerthread():
             es.index(index=ind,doc_type=user,body=positive,timeout='3000s')
             es.indices.refresh(index=ind)
             response = es.search(index=ind,doc_type=user)
-            print "urls for user:",response
+            queueName = 'sparkfeedback'
+            queue = self.sqs.get_queue_by_name(QueueName=queueName)
+            queue.send_message(MessageBody=user)
+            print "message sent to SQS....."
+            #print "urls for user:",response
             #self.client_sns.publish(TopicArn=self.sns_arn, Message=json.dumps(positive), Subject='Pixabay')
             #print 'message pushed'
         except Exception, e:
