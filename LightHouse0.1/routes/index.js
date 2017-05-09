@@ -11,8 +11,10 @@ var session = require('express-session');
 var es = require('elasticsearch');
 var connection_str='https://***REMOVED***.us-east-1.es.amazonaws.com';
 var client = new es.Client({
-  host:'https://***REMOVED***'
+  host:'https://***REMOVED***.us-east-1.es.amazonaws.com'
 });
+
+
 
 var Clarifai = require('clarifai');
 var Clarifai_app = new Clarifai.App(
@@ -188,16 +190,12 @@ var storage = multer.diskStorage({
 });
  
 var upload = multer({ storage: storage });
-aws.config.update({ accessKeyId: 'AKIAJBUGQ7FZI3OWXKDA', secretAccessKey: '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' });
-aws.config.update({region: 'us-east-1'});
 // dev.sociogators.files
  
  
 router.get('/upload', function(req, res, next) {
     res.render('upload', {title :'xxx'});
-       
 });
- 
  
 router.post('/upload', upload.single('sampleFile'),   function(req, res, next) {
     var s3 = new aws.S3();
@@ -253,7 +251,6 @@ router.post('/download', function(req, res, next){
         }
       }
     );
-     
     // var file = fs.createWriteStream('/public/images/'+req.body.diskname+'');
     // s3.getObject(params).createReadStream().pipe(file);
  
@@ -261,15 +258,47 @@ router.post('/download', function(req, res, next){
  
 });
 
-router.get('/rec',function(req,res){
+router.get('/rec',restrict,function(req,res){
   res.render('rec');
 });
 
 router.get('/recimg',function(req,res){
- // console.log(req.session.user);
+  //sqs
+      var u=JSON.stringify({'user':req.session.user});
+      var params={
+        MessageBody: u, 
+        QueueUrl: 'https://sqs.us-east-1.amazonaws.com/145842502534/lighthouseusername', 
+      };
+      
+      sqs.sendMessage(params, function(err, data) {
+        if (err) console.log(err, err.stack); // an error occurred
+        else     console.log(data);           // successful response
+      });
+
+  var receive={
+    QueueUrl: 'https://sqs.us-east-1.amazonaws.com/145842502534/sparkfeedback'
+  };
+  sqs.receiveMessage(receive, function(err, data) {
+        if (err) console.log(err, err.stack); // an error occurred
+        else{
+          console.log(data);
+          console.log(data['Messages'][0]['Body']);
+          if(data['Messages'][0]['Body']==req.session.user){
+          var del={
+            QueueUrl: 'https://sqs.us-east-1.amazonaws.com/145842502534/sparkfeedback',
+            ReceiptHandle: data['Messages'][0]['ReceiptHandle']  
+          };
+          sqs.deleteMessage(del,function(err,data){
+            if(err) console.log(err,err.stack);
+            else{
+              console.log(data);
+              console.log('deleted');
+
+              //es
+// console.log(req.session.user);
   var s_params={
-    index:'tweets',
-    type:'Health_like',
+    index:'pixabay-predict',
+    type:req.session.user,
     size:5,
     body:{
       query:{
@@ -282,12 +311,46 @@ router.get('/recimg',function(req,res){
       console.log(err);
     }
     else{
-      console.log(data['hits']['hits']);
+     // console.log(data['hits']['hits'][0]['_source']["url"]);
+      res.send(data['hits']['hits'][0]['_source']["url"]);
     }
   });
-  //j={'a':'1','b':'2','c':'3'};
-  j=[1,2,3];
-  res.send(j);
+              //es
+
+
+            }
+          });
+        }
+        else 
+          res.send('err');
+        }           
+      });
+
+
+/*
+ // console.log(req.session.user);
+  var s_params={
+    index:'pixabay-predict',
+    type:req.session.user,
+    size:5,
+    body:{
+      query:{
+        match_all:{}
+      }
+    }
+  };
+  client.search(s_params,function(err,data){
+    if(err){
+      console.log(err);
+    }
+    else{
+     // console.log(data['hits']['hits'][0]['_source']["url"]);
+      res.send(data['hits']['hits'][0]['_source']["url"]);
+    }
+  });
+  */
+ // j=[1,2,3];
+ // res.send(j);
 });
 
 router.get('/feedback', function(req, res){
@@ -309,6 +372,7 @@ router.get('/feedback', function(req, res){
       }
       labels=labels.substring(0,labels.length-1);
       console.log(labels);
+      /*  
       var fb={
         'feedback':feedback,
         'labels':labels,
@@ -324,16 +388,25 @@ router.get('/feedback', function(req, res){
         console.log('updated!');
         }
       });
+      */
 //sqs
+      var dic={
+        "label":Number(feedback),
+        "tags":labels,
+        "user":req.session.user
+      };
+      console.log(dic);
+      var dic_2=JSON.stringify(dic);
+      console.log(dic_2);
       var params={
-        MessageBody: 'feedback', 
-        QueueUrl: 'https://sqs.us-east-1.amazonaws.com/145842502534/lighthousefeedback', 
+        MessageBody: dic_2, 
+        QueueUrl: 'https://sqs.us-east-1.amazonaws.com/145842502534/nofeedback', 
         MessageAttributes: {
-          "feedback": {
+          "label": {
           DataType: "String", 
           StringValue: feedback
           },
-          "labels": {
+          "tags": {
           DataType: "String", 
           StringValue: labels
           },
