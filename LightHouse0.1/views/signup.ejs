@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Sign up for LightHouse!</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <h1>Welcome to LightHouse!</h1>
+    <p><%= title %></p>
+    <div class="uinput">
+        <form id="signupForm" name="signupForm" method="post" action="" encType="multipart/form-data">
+            
+                
+                <label for="username">Username:</label>
+                <br />
+                <input type="text" class="binput" name="username" placeholder="Username"/ style="width: 350px;">
+            
+           
+                <br />
+                <label for="password">Password:</label>
+                <br />
+                <input type="password" class="binput" name="password" placeholder="********"/ style="width: 350px;">
+                
+                <br />
+                <label for="password2">Confirm Password:</label>
+                <br />
+                <input type="password" class="binput" name="password2" placeholder="********"/ style="width: 350px;">
+           
+                <br />
+                <label for="email">Email Address:</label>
+                <br />
+                <input type="email" class="binput" name="email" placeholder="Email Address"/ style="width: 350px;">
+            
+           
+                <br />
+                <label for="number">Phone Number:</label>
+                <br />
+                <input type="number" class="binput" name="number" placeholder="Phone Number"/ style="width: 350px;">
+            
+           
+                <br />
+                <label for="sampleFile">Upload Profile Photo:</label>
+                <br />
+                <input type="file" name="sampleFile"/>
+
+            
+            <div class="signup">
+                <input type="submit" class="btn btn-primary btn-sm" value="Sign me up!"/>
+                <input type="Reset" class="btn btn-primary btn-sm" value="Reset"/>
+            </div>
+        </form>
+        <div class="b1">
+            <p><font size="4">Already in LightHouse? Sign in <a href="./signin">here</a>!</font></p>
+        </div>
+    </div>
+  </body>
+</html>

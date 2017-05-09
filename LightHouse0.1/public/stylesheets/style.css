@@ -1,0 +1,29 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  background: url("../images/lighthouse.jpg") no-repeat center center fixed; 
+  background-size: cover;
+}
+
+a {
+  color: #00B7FF;
+}
+
+.uinput {
+    	position: relative;
+    	line-height: 160%;
+}
+.binput{
+	border-style: inset;
+	border-width: 3px;
+}
+.signup {
+    	position: relative;
+    	top: 20px;
+    	left: 0px;
+}
+
+.b1 {
+	position: relative;
+	top: 50px;
+}

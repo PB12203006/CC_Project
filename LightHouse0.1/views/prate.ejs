@@ -1,0 +1,134 @@
+<html>
+<head>
+    <title>What's up</title>
+    <style>
+        body {
+      
+        background: url("https://zellox.com/wp-content/uploads/2016/05/website-backgrounds-%E2%80%AB1%E2%80%AC-%E2%80%AB%E2%80%AC.jpg") no-repeat center center fixed; 
+        background-size: cover;
+        }
+        .title {
+            font-size: 4em;
+            text-align: center;
+            border: 3px solid red;
+        }
+
+        .photo {
+            text-align: center;
+        }
+    
+        .phtot img{
+            display: inline-block;
+        }
+
+        .tb2 {
+            position: relative;
+            top: 60px;
+            margin-left: auto; 
+            margin-right: auto; 
+            width: 300px;
+        }
+        .cc-selector input{
+            margin:0;padding:0;
+            -webkit-appearance:none;
+            -moz-appearance:none;
+            appearance:none;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script>
+        pic_url='';
+        url = "https://api.flickr.com/services/rest/?method=flickr.interestingness.getList&api_key=***REMOVED***&format=json&nojsoncallback=1";
+        var pc = '';
+        var data;
+        var ind=0;
+        function getImageUrl (photo, format) {
+	       return "https://farm" + photo.farm + ".static.flickr.com/" + photo.server + "/" + photo.id + "_" + photo.secret + format + ".jpg";
+        }
+
+// handy function to retrieve the original photo if available
+        function getOriginalImageUrl (photo) {
+	       return "https://farm" + photo.farm + ".static.flickr.com/" + photo.server + "/" + photo.id + "_" + photo.originalsecret + "_" + "o."+photo.originalformat;
+        }
+
+// get the image url according to its best size
+// If one of the side is greater than 1280 then a large (_b) version is created
+        function getBestImageUrl(photo) {
+            if(photo.o_width)
+            {
+                if (photo.o_width > 1280 || photo.o_height > 1280)
+        	       return getImageUrl(photo, '_b');
+                return getOriginalImageUrl(photo);
+            }
+            return getImageUrl(photo, '');
+        }
+        $.getJSON(url, function(json){
+            console.log(json.photos.photo[0]);
+            data=json.photos.photo;
+            display(0)
+                });
+        function display(index){
+            var proto = data[index];
+            var ustring = getBestImageUrl(proto);//"https://farm" + farm + ".staticflickr.com/" + server +"/" + id+"_"+secret+".jpg";
+            //https://farm{farm-id}.staticflickr.com/{server-id}/{id}_{secret}.jpg
+            var pic = ustring;
+            pic_url = ustring;
+            var pc = "";
+            pc = '<img src='+pic+'>';
+            console.log(pc);
+            $("#results").empty();
+            $("#results").append(pc);
+        }
+        function feedback(){
+            var f=$('input[name=img]:checked').val();
+            console.log(f);
+            $.getJSON('/feedback',{'f':f,'pic_url':pic_url},function(data){
+                console.log(data);
+            });
+            ind=ind+1;
+            console.log(ind);
+            display(ind);
+        }
+        
+
+    </script>
+</head>
+    <body>
+        <h1 class="title">WHAT'S UP?</h1>
+        <div id="results" class="photo"></div>
+        <div class = "tb2">
+            <table align="center">
+                <form>
+                    <tr>
+                        <td>
+                            <label for="like" class="cc-selector">
+                                <input type="radio" id="like" name="img" value="1" onclick="feedback();"/>
+                                <img src="https://cdn.worldvectorlogo.com/logos/facebook-haha.svg" height="42" width="42">
+                            </label>
+                        </td>
+                        <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                        <td>
+                            <label for="dislike" class="cc-selector">
+                                <input type="radio" id="dislike" name="img" value="-1" onclick="feedback();"/ >
+                                <img src="https://cdn.worldvectorlogo.com/logos/facebook-angry.svg" height="42" width="42">
+                            </label>
+                        </td>
+                    </tr>
+                </form>
+            </table>
+        </div>
+        <!--
+        <table width="100%" border=0 class="tb2">
+        <tr>
+            <td><img width="50" src='https://tctechcrunch2011.files.wordpress.com/2016/02/haha.png'></td>
+            <td><img width="50" src='https://tctechcrunch2011.files.wordpress.com/2016/02/wow.png'></td>
+            <td><img width="50" src='https://tctechcrunch2011.files.wordpress.com/2016/02/sad.png'></td>
+            <td><img width="50" src='https://tctechcrunch2011.files.wordpress.com/2016/02/angry.png'></td>
+        </tr>
+        </table>
+    -->
+    <script type=text/javascript>
+        $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    </script>
+</body>
+</html>

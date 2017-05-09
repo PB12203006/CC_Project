@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Upload file to LightHouse!</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+  </head>
+  <body>
+    <form name='uploadForm' 
+      id='uploadForm' 
+      action='http://localhost:3000/upload' 
+      method='post' 
+      encType="multipart/form-data">
+        <div>
+          <input type="file" name="sampleFile"/>
+        </div>
+        <div>
+          <p></p>
+          <input type='submit' value='Upload!' />
+        </div>
+    </form>     
+  </body>
+</html>
