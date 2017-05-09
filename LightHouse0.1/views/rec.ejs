@@ -1,0 +1,91 @@
+<html>
+<head>
+    <title>What's up</title>
+    <style>
+        body {
+      
+        background: url("https://zellox.com/wp-content/uploads/2016/05/website-backgrounds-%E2%80%AB1%E2%80%AC-%E2%80%AB%E2%80%AC.jpg") no-repeat center center fixed; 
+        background-size: cover;
+        }
+        .title {
+            font-size: 4em;
+            text-align: center;
+            border: 3px solid red;
+        }
+
+        .photo {
+            text-align: center;
+        }
+    
+        .phtot img{
+            display: inline-block;
+        }
+
+        .tb2 {
+            position: relative;
+            top: 60px;
+            margin-left: auto; 
+            margin-right: auto; 
+            width: 300px;
+        }
+        .cc-selector input{
+            margin:0;padding:0;
+            -webkit-appearance:none;
+            -moz-appearance:none;
+            appearance:none;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script>
+        var data=[];
+        var ind=0;
+        $.getJSON('/recimg', function(json){
+            console.log(json);
+            data=json;
+            /*
+            for(var key in json){
+                data.push(json[key]);
+            }
+            console.log(data);
+            */
+            display(0)
+                });
+        function display(index){
+            var pic = data[index];
+            var pc = "";
+            pc = '<img src='+pic+'>';
+            console.log(pc);
+            $("#results").empty();
+            if(data[index]==undefined){
+                $('#results').empty();
+                $('#results').append('<p>no more img</p>');  
+            }
+            else{
+                $("#results").append(pc);
+            }
+        }
+        function display_next(){
+            ind=ind+1;
+            display(ind);
+        }
+    </script>
+</head>
+    <body>
+        <h1 class="title">WHAT'S UP?</h1>
+        <div id="results" class="photo"></div>
+        <div class = "tb2">
+            <table align="center">
+                <form>
+                    <tr>
+                        <td>
+                            <label for="like" class="cc-selector">
+                                <input type="radio" id="like" name="img" value="1" onclick="display_next();"/>
+                                <img src="https://cdn.worldvectorlogo.com/logos/facebook-haha.svg" height="42" width="42">
+                            </label>
+                        </td>
+                    </tr>
+                </form>
+            </table>
+        </div>
+</body>
+</html>
