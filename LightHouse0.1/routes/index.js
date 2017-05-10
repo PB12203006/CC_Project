@@ -31,6 +31,62 @@ function restrict(req, res, next) {
   }
 }
 
+function recur(req,res){
+  var receive={
+    QueueUrl: 'https://***REMOVED***',
+    WaitTimeSeconds: 2
+  };
+
+  sqs.receiveMessage(receive, function(err, data) {
+    if (err) console.log(err,err.stack); // an error occurred
+    else{
+      console.log('receiving');
+      console.log(data);
+      if(data!=undefined){
+        console.log(data['Messages'][0]['Body']);
+        if(data['Messages'][0]['Body']==req.session.user){
+          var del={
+            QueueUrl: 'https://***REMOVED***',
+            ReceiptHandle: data['Messages'][0]['ReceiptHandle']  
+          };
+          sqs.deleteMessage(del,function(err,data){
+            if(err) console.log(err,err.stack);
+            else{
+              console.log(data);
+              console.log('deleted');
+                   //es
+// conso  le.log(req.session.user);
+              var s_params={
+                index:'pixabay-predict',
+                type:req.session.user,
+                size:5,
+                body:{
+                  query:{
+                    match_all:{}
+                  }
+                }
+              };
+              client.search(s_params,function(err,data){
+              if(err){
+                console.log(err);
+              }
+              else{
+     //   console.log(data['hits']['hits'][0]['_source']["url"]);
+                res.send(data['hits']['hits'][0]['_source']["url"]);
+                //break;
+              }
+              });
+                //es
+            }
+          });
+        }
+      else{
+        recur(req,res);
+      }
+      }
+    }           
+   });
+}
 /* GET home page. */
 router.get('/lighthouse', restrict, function(req, res, next) {
   res.render('lighthouse',{title:req.session.user, img: req.session.img, tp: req.session.tp});
@@ -264,67 +320,73 @@ router.get('/rec',restrict,function(req,res){
 
 router.get('/recimg',function(req,res){
   //sqs
-      var u=JSON.stringify({'user':req.session.user});
-      var params={
-        MessageBody: u, 
-        QueueUrl: 'https://sqs.us-east-1.amazonaws.com/145842502534/lighthouseusername', 
-      };
-      
-      sqs.sendMessage(params, function(err, data) {
-        if (err) console.log(err, err.stack); // an error occurred
-        else     console.log(data);           // successful response
-      });
-
-  var receive={
-    QueueUrl: 'https://sqs.us-east-1.amazonaws.com/145842502534/sparkfeedback'
+  var u=JSON.stringify({'user':req.session.user});
+  var params={
+    MessageBody: u, 
+    QueueUrl: 'https://sqs.us-west-2.amazonaws.com/145842502534/lighthouseusername', 
   };
-  sqs.receiveMessage(receive, function(err, data) {
-        if (err) console.log(err, err.stack); // an error occurred
-        else{
-          console.log(data);
+  
+  sqs.sendMessage(params, function(err, data) {
+    if (err) console.log(err, err.stack); // an error occurred
+    else     console.log(data);           // successful response
+  });
+  recur(req,res);
+  /*
+  var receive={
+    QueueUrl: 'https://***REMOVED***',
+    WaitTimeSeconds: 2
+  };
+//  while(1){
+    //console.log('trying');
+    sqs.receiveMessage(receive, function(err, data) {
+      if (err) console.log('err'); // an error occurred
+      else{
+        console.log('receiving');
+        console.log(data);
+        if(data!=undefined){
           console.log(data['Messages'][0]['Body']);
           if(data['Messages'][0]['Body']==req.session.user){
-          var del={
-            QueueUrl: 'https://sqs.us-east-1.amazonaws.com/145842502534/sparkfeedback',
-            ReceiptHandle: data['Messages'][0]['ReceiptHandle']  
-          };
-          sqs.deleteMessage(del,function(err,data){
-            if(err) console.log(err,err.stack);
-            else{
-              console.log(data);
-              console.log('deleted');
-
-              //es
-// console.log(req.session.user);
-  var s_params={
-    index:'pixabay-predict',
-    type:req.session.user,
-    size:5,
-    body:{
-      query:{
-        match_all:{}
-      }
-    }
-  };
-  client.search(s_params,function(err,data){
-    if(err){
-      console.log(err);
-    }
-    else{
-     // console.log(data['hits']['hits'][0]['_source']["url"]);
-      res.send(data['hits']['hits'][0]['_source']["url"]);
-    }
-  });
-              //es
-
-
-            }
-          });
+            var del={
+              QueueUrl: 'https://***REMOVED***',
+              ReceiptHandle: data['Messages'][0]['ReceiptHandle']  
+            };
+            sqs.deleteMessage(del,function(err,data){
+              if(err) console.log(err,err.stack);
+              else{
+                console.log(data);
+                console.log('deleted');
+    
+                  //es
+//   conso  le.log(req.session.user);
+                var s_params={
+                  index:'pixabay-predict',
+                  type:req.session.user,
+                  size:5,
+                  body:{
+                    query:{
+                      match_all:{}
+                    }
+                  }
+                };
+                client.search(s_params,function(err,data){
+                if(err){
+                  console.log(err);
+                }
+                else{
+       //   console.log(data['hits']['hits'][0]['_source']["url"]);
+                  res.send(data['hits']['hits'][0]['_source']["url"]);
+                  //break;
+                }
+                });
+                  //es
+              }
+            });
+          }
         }
-        else 
-          res.send('err');
-        }           
-      });
+      }           
+    });
+ // }
+ */
 
 
 /*
@@ -400,7 +462,7 @@ router.get('/feedback', function(req, res){
       console.log(dic_2);
       var params={
         MessageBody: dic_2, 
-        QueueUrl: 'https://sqs.us-east-1.amazonaws.com/145842502534/nofeedback', 
+        QueueUrl: 'https://sqs.us-west-2.amazonaws.com/145842502534/nofeedback', 
         MessageAttributes: {
           "label": {
           DataType: "String", 
