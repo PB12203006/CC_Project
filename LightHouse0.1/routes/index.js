@@ -44,6 +44,48 @@ function recur(req,res){
       console.log(data);
       if(data!=undefined){
         console.log(data['Messages'][0]['Body']);
+        var body=JSON.parse(data['Messages'][0]['Body']);
+        console.log(body);
+        if(body['user']==req.session.user){
+          var del={
+            QueueUrl: 'https://***REMOVED***',
+            ReceiptHandle: data['Messages'][0]['ReceiptHandle']  
+          };
+          sqs.deleteMessage(del,function(err,data){
+            if(err) console.log(err,err.stack);
+            else{
+              console.log(data);
+              console.log('deleted');
+                   //es
+// conso  le.log(req.session.user);
+              console.log(body['url']);
+              res.send(body['url']);
+                //es
+            }
+          });
+        }
+      else{
+        recur(req,res);
+      }
+      }
+    }           
+   });
+}
+
+
+function recur2(req,res){
+  var receive={
+    QueueUrl: 'https://***REMOVED***',
+    WaitTimeSeconds: 2
+  };
+
+  sqs.receiveMessage(receive, function(err, data) {
+    if (err) console.log(err,err.stack); // an error occurred
+    else{
+      console.log('receiving');
+      console.log(data);
+      if(data!=undefined){
+        console.log(data['Messages'][0]['Body']);
         if(data['Messages'][0]['Body']==req.session.user){
           var del={
             QueueUrl: 'https://***REMOVED***',
