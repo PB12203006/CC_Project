@@ -7,7 +7,7 @@
         background: url("https://zellox.com/wp-content/uploads/2016/05/website-backgrounds-%E2%80%AB1%E2%80%AC-%E2%80%AB%E2%80%AC.jpg") no-repeat center center fixed; 
         background-size: cover;
         }
-	header {
+        header {
             width:100%;
             position:relative;
             text-align:center;
@@ -59,12 +59,12 @@
         var data;
         var ind=0;
         function getImageUrl (photo, format) {
-	       return "https://farm" + photo.farm + ".static.flickr.com/" + photo.server + "/" + photo.id + "_" + photo.secret + format + ".jpg";
+               return "https://farm" + photo.farm + ".static.flickr.com/" + photo.server + "/" + photo.id + "_" + photo.secret + format + ".jpg";
         }
 
 // handy function to retrieve the original photo if available
         function getOriginalImageUrl (photo) {
-	       return "https://farm" + photo.farm + ".static.flickr.com/" + photo.server + "/" + photo.id + "_" + photo.originalsecret + "_" + "o."+photo.originalformat;
+               return "https://farm" + photo.farm + ".static.flickr.com/" + photo.server + "/" + photo.id + "_" + photo.originalsecret + "_" + "o."+photo.originalformat;
         }
 
 // get the image url according to its best size
@@ -73,7 +73,7 @@
             if(photo.o_width)
             {
                 if (photo.o_width > 1280 || photo.o_height > 1280)
-        	       return getImageUrl(photo, '_b');
+                       return getImageUrl(photo, '_b');
                 return getOriginalImageUrl(photo);
             }
             return getImageUrl(photo, '');
@@ -118,11 +118,7 @@
 </head>
     <body>
         <h1 class="title">WHAT'S UP?</h1>
-	<header>
-        <a href="../lighthouse">Back to the LightHouse
-            <i class="fa fa-fw fa-external-link"></i>
-        </a>
-        </header>
+
         <div id="results" class="photo"></div>
         <div class = "tb2">
             <table align="center">
@@ -145,5 +141,11 @@
                 </form>
             </table>
         </div>
+        
+        <header>
+        <a href="../lighthouse">Back to the LightHouse
+            <i class="fa fa-fw fa-external-link"></i>
+        </a>
+        </header>
 </body>
 </html>
