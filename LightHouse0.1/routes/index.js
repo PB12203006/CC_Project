@@ -5,7 +5,7 @@ var fs = require('fs');
 var aws = require('aws-sdk');
 var path = require('path');
 var AWS = require('aws-sdk');
-AWS.config.update({region:'us-east-1'});
+AWS.config.update({region:'us-west-2'});
 var sqs = new AWS.SQS();
 var session = require('express-session');
 var es = require('elasticsearch');
@@ -42,7 +42,7 @@ function recur(req,res){
     else{
       console.log('receiving');
       console.log(data);
-      if(data!=undefined){
+      if(data!=undefined && data['Messages']!=undefined && data['Messages'][0]!=undefined && data['Messages'][0]['Body'] !=undefined){
         console.log(data['Messages'][0]['Body']);
         var body=JSON.parse(data['Messages'][0]['Body']);
         console.log(body);
@@ -58,8 +58,15 @@ function recur(req,res){
               console.log('deleted');
                    //es
 // conso  le.log(req.session.user);
-              console.log(body['url']);
-              res.send(body['url']);
+
+              console.log(body['url'].length);
+           //   if(body['url'].length==0){
+              //  recur(req,res);
+            //  }
+           //   else{
+                console.log(body['url']);
+                res.send(body['url']);
+            //  }
                 //es
             }
           });
@@ -67,6 +74,9 @@ function recur(req,res){
       else{
         recur(req,res);
       }
+      }
+      else{
+        recur(req,res);
       }
     }           
    });
@@ -329,7 +339,7 @@ router.post('/upload', upload.single('sampleFile'),   function(req, res, next) {
    res.redirect('/upload');
    
 });
- 
+
  
 router.post('/download', function(req, res, next){
     var s3 = new aws.S3();
