@@ -104,7 +104,7 @@ class PerceptronforRDD():
     def perceptronSingle(self,m,y):
         y = y.map(lambda x: -1.0*(x==0.0 or x==-1.0)+(x==1.0))
         pred = m.first().dot(self.w)+self.b
-        if y.first()*pred<0:
+        if y.first()*pred<=0:
             self.w = self.w+y.first()*m.first().toArray()
             self.b = self.b+y.first()
         return [self.w, self.b]
@@ -120,7 +120,7 @@ class PerceptronforRDD():
 			for i in ind:
 				pred = m[i].dot(self.w)+self.b
 				#print "label and predict:",y[i],pred
-				if y[i]*pred<0:
+				if y[i]*pred<=0:
 					#print "label and predict:",i,y[i],pred
 					self.w = self.w+y[i]*m[i].toArray()
 					self.b = self.b+y[i]
@@ -134,7 +134,7 @@ class PerceptronforRDD():
 		random.shuffle(ind)
 		for i in ind:
 			pred = data[i].dot(self.w) + self.b
-			if label[i]*pred<0:
+			if label[i]*pred<=0:
 				self.w = self.w + label[i]*data[i].toArray()
 				self.b = self.b + label[i]
 				self.u_avg = self.u_avg + self.count_avg*label[i]*data[i].toArray()
@@ -154,7 +154,7 @@ class PerceptronforRDD():
 			random.shuffle(ind)
 			for i in ind:
 				pred = data[i].dot(self.w) + self.b
-				if label[i]*pred<0:
+				if label[i]*pred<=0:
 					#print "label and pred for",i,":",label[i],pred
 					#print "data:", data[i].toArray()
 					self.w = self.w + label[i]*data[i].toArray()
@@ -186,7 +186,7 @@ class PerceptronforRDD():
 		w = self.w
 		b = self.b
 		predict = tf.map(lambda x: x.dot(w)+b, preservesPartitioning=True).zip(links)
-		predictPositive = predict.filter(lambda p: p[0]>=0)
+		predictPositive = predict.filter(lambda p: p[0]>0)
 		print predictPositive.take(10)
 		return predictPositive
 
