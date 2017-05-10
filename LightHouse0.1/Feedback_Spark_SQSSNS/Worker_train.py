@@ -51,7 +51,7 @@ class workerthread():
             #links = messages.map(lambda x: x["url"],preservesPartitioning=True)
             tf = self.hashingTF.transform(tags)
             #train = tf.zip(messages).map(lambda x: {"tf":x[0],"label":x[1]["label"]})
-            model.perceptronBatch(data=tf,labels=labels,MaxItr=10)
+            model.AveragePerceptron(data=tf,labels=labels,MaxItr=10)
             model.save("models/"+user+".json",average=True)
             #test = tf.zip(messages).map(lambda x:{"tf":x[0],"link":x[1]["url"]})
             print "save_path:","models/"+user+".json"
