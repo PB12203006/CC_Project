@@ -69,6 +69,12 @@
                 });
         function display(index){
             var proto = data[index];
+            if (proto==undefined){
+                $("#results").empty();
+                var str='<p><a href='+"./rec"+'>no more img, go to reccomendation</a></p>'
+                $("#results").append(str);
+            }
+            else{
             var ustring = getBestImageUrl(proto);//"https://farm" + farm + ".staticflickr.com/" + server +"/" + id+"_"+secret+".jpg";
             //https://farm{farm-id}.staticflickr.com/{server-id}/{id}_{secret}.jpg
             var pic = ustring;
@@ -78,6 +84,7 @@
             console.log(pc);
             $("#results").empty();
             $("#results").append(pc);
+            }
         }
         function feedback(){
             var f=$('input[name=img]:checked').val();
