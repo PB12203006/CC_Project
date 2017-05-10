@@ -15,14 +15,14 @@ import thread
 from pyspark.sql import SparkSession
 from pyspark import SparkContext
 from pyspark.mllib.feature import HashingTF
-sc=SparkContext(appName="Flickr-train")
+#sc=SparkContext(appName="Flickr-train")
 
 spark = SparkSession \
     .builder \
     .appName("Flickr-train").getOrCreate()
 #    .config("spark.mongodb.input.uri", "mongodb://127.0.0.1/test.coll") \
 #    .config("spark.mongodb.output.uri", "mongodb://127.0.0.1/test.coll") \
-
+sc=spark.sparkContext
 
 numFeatures = 1000
 hashingTF = HashingTF(numFeatures=numFeatures)

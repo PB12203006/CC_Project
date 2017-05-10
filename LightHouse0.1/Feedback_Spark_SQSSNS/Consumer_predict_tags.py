@@ -18,13 +18,13 @@ import thread
 from pyspark.sql import SparkSession
 from pyspark import SparkContext
 from pyspark.mllib.feature import HashingTF
-sc=SparkContext(appName="Pixabay-predict")
+#sc=SparkContext(appName="Pixabay-predict")
 spark = SparkSession \
     .builder \
     .appName("Pixabay-predict").getOrCreate()
 #    .config("spark.mongodb.input.uri", "mongodb://127.0.0.1/test.coll") \
 #    .config("spark.mongodb.output.uri", "mongodb://127.0.0.1/test.coll") \
-
+sc=spark.sparkContext
 
 numFeatures = 1000
 hashingTF = HashingTF(numFeatures=numFeatures)
@@ -33,6 +33,8 @@ def ProcessBatchMessages(queue, batch_size=1, Flag=True):
     # Process messages
     while Flag:
         try:
+            #worker = Worker.workerthread(hashingTF,spark)
+            #worker.WorkonMessages([{"user":"sarsa"}],sc)
         #if True:
             count = 0
             batch_messages = []
@@ -78,7 +80,7 @@ def ConsumeMessages(batch_size=1):
     # Get the queue
     queueName = 'lighthouseusername'
     queue = sqs.get_queue_by_name(QueueName=queueName)
-
+    print queue.url
     # Consume the messages in queue
     ProcessBatchMessages(queue, batch_size)
 
