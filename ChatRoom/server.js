@@ -1,5 +1,5 @@
 /*
-Created by Guowei Xu for LightHouse Chatroom
+Created by Guowei Xu for LightHouse Chatroom.
 */
 var express = require("express")
   , app = express()
