@@ -19,20 +19,7 @@ import requests
 import sys
 reload(sys)
 sys.setdefaultencoding('UTF8')
-from elasticsearch import Elasticsearch, RequestsHttpConnection
-from requests_aws4auth import AWS4Auth
 
-#Variables that contains the user credentials to access AWS Elastucsearch
-host = '***REMOVED***.us-east-1.es.amazonaws.com'
-awsauth = AWS4Auth('***REMOVED***', '***REMOVED***', 'us-east-1', 'es')
-
-es = Elasticsearch(
-    hosts=[{'host': host, 'port': 443}],
-    http_auth=awsauth,
-    use_ssl=True,
-    verify_certs=True,
-    connection_class=RequestsHttpConnection
-)
 
 class workerthread():
     def __init__(self, hashingTF, spark):
@@ -83,7 +70,7 @@ class workerthread():
             #mongodb.write.format("com.mongodb.spark.sql.DefaultSource").mode("overwrite").option("database", \
             #                        "test").option("collection", "colllabeled").save()
             print json.dumps(positive, indent=4)
-
+            """
             ind = "pixabay-predict"
             if not es.indices.exists(index=ind):
                 es.indices.create(index=ind, ignore=[400,404])
@@ -96,10 +83,12 @@ class workerthread():
             es.indices.refresh(index=ind)
             es.index(index=ind,doc_type=user,body=positive,timeout='3000s')
             es.indices.refresh(index=ind)
+            print "update data in elasticsearch"
             response = es.search(index=ind,doc_type=user)
+            """
             queueName = 'sparkfeedback'
             queue = self.sqs.get_queue_by_name(QueueName=queueName)
-            queue.send_message(MessageBody=user)
+            queue.send_message(MessageBody=json.dumps(positive))
             print "message sent to SQS....."
             #print "urls for user:",response
             #self.client_sns.publish(TopicArn=self.sns_arn, Message=json.dumps(positive), Subject='Pixabay')
