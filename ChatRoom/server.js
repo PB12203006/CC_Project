@@ -1,13 +1,6 @@
 /*
- Module dependencies:
-
- - Express
- - Http (to run Express)
- - Body parser (to parse JSON requests)
- - Underscore (because it's cool)
- - Socket.IO
-
- */
+Created by Guowei Xu for LightHouse Chatroom
+*/
 var express = require("express")
   , app = express()
   , http = require("http").createServer(app)
