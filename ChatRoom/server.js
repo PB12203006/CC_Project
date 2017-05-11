@@ -27,7 +27,7 @@ var participants = [];
 var messages=[]
 /* Server config */
 
-//Server's IP address
+//Server's IP address, make it accessable to the world
 app.set("ipaddr", "0.0.0.0");
 
 //Server's port number
