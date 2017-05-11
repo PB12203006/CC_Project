@@ -40,7 +40,7 @@ app.use(bodyParser.json());
 
 /* Server routing */
 
-//Handle route "GET /", as in "http://localhost:8080/"
+//Handle route "GET /"
 app.get("/", function(request, response) {
 
   //Render the view called "index"
