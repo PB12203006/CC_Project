@@ -7,7 +7,7 @@ This is group 11 LightHouse
 
 Commands to start the server:  
 Navigate to CC_Project/LightHouse0.1/ folder  
-Initiate use `express LightHouse0.1 --view=ejs`
+Initiate use `express LightHouse0.1 --view=ejs`  
 `npm install` first to get node_modules installed and use `npm start` to start  
 
 Note:  
