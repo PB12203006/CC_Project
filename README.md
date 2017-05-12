@@ -1,3 +1,4 @@
+This is group 11 LightHouse
 1. Sign up(upload files into MongoDB, MongoDB check if username exists); 
    Sign in(MongoDB check whether username exists and username+password match);
    Homepage
