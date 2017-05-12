@@ -5,7 +5,7 @@ var fs = require('fs');
 var aws = require('aws-sdk');
 var path = require('path');
 var AWS = require('aws-sdk');
-AWS.config.update({region:'us-east-1'});
+AWS.config.update({region:'us-west-2'});
 var sqs = new AWS.SQS();
 var session = require('express-session');
 var es = require('elasticsearch');
@@ -15,13 +15,14 @@ var client = new es.Client({
 });
 
 
-
+//this API is for recognizing pictures
 var Clarifai = require('clarifai');
 var Clarifai_app = new Clarifai.App(
       '***REMOVED***',
       '***REMOVED***'
     );
 
+//this function is for maintaining the login session
 function restrict(req, res, next) {
   if (req.session.user) {
     next();
@@ -31,18 +32,18 @@ function restrict(req, res, next) {
   }
 }
 
+//this function recursively receives messages from sqs until getting a message corresponding to the specific user it requires
 function recur(req,res){
   var receive={
     QueueUrl: 'https://***REMOVED***',
     WaitTimeSeconds: 2
   };
-
   sqs.receiveMessage(receive, function(err, data) {
     if (err) console.log(err,err.stack); // an error occurred
     else{
       console.log('receiving');
       console.log(data);
-      if(data!=undefined){
+      if(data!=undefined && data['Messages']!=undefined && data['Messages'][0]!=undefined && data['Messages'][0]['Body'] !=undefined){
         console.log(data['Messages'][0]['Body']);
         var body=JSON.parse(data['Messages'][0]['Body']);
         console.log(body);
@@ -56,11 +57,9 @@ function recur(req,res){
             else{
               console.log(data);
               console.log('deleted');
-                   //es
-// conso  le.log(req.session.user);
-              console.log(body['url']);
-              res.send(body['url']);
-                //es
+              console.log(body['url'].length);
+                console.log(body['url']);
+                res.send(body['url']);
             }
           });
         }
@@ -68,67 +67,13 @@ function recur(req,res){
         recur(req,res);
       }
       }
-    }           
-   });
-}
-
-
-function recur2(req,res){
-  var receive={
-    QueueUrl: 'https://***REMOVED***',
-    WaitTimeSeconds: 2
-  };
-
-  sqs.receiveMessage(receive, function(err, data) {
-    if (err) console.log(err,err.stack); // an error occurred
-    else{
-      console.log('receiving');
-      console.log(data);
-      if(data!=undefined){
-        console.log(data['Messages'][0]['Body']);
-        if(data['Messages'][0]['Body']==req.session.user){
-          var del={
-            QueueUrl: 'https://***REMOVED***',
-            ReceiptHandle: data['Messages'][0]['ReceiptHandle']  
-          };
-          sqs.deleteMessage(del,function(err,data){
-            if(err) console.log(err,err.stack);
-            else{
-              console.log(data);
-              console.log('deleted');
-                   //es
-// conso  le.log(req.session.user);
-              var s_params={
-                index:'pixabay-predict',
-                type:req.session.user,
-                size:5,
-                body:{
-                  query:{
-                    match_all:{}
-                  }
-                }
-              };
-              client.search(s_params,function(err,data){
-              if(err){
-                console.log(err);
-              }
-              else{
-     //   console.log(data['hits']['hits'][0]['_source']["url"]);
-                res.send(data['hits']['hits'][0]['_source']["url"]);
-                //break;
-              }
-              });
-                //es
-            }
-          });
-        }
       else{
         recur(req,res);
       }
-      }
     }           
    });
 }
+
 /* GET home page. */
 router.get('/lighthouse', restrict, function(req, res, next) {
   res.render('lighthouse',{title:req.session.user, img: req.session.img, tp: req.session.tp});
@@ -144,7 +89,7 @@ router.get('/signin', function(req, res) {
     res.render('signin', { title: 'Sign in for LightHouse!' });
 });
 
-/* POST to DashBoard*/
+/* Process login request*/
 router.post('/signin', function(req, res){
   console.log('post')
   //Set our internal DB variable
@@ -162,11 +107,8 @@ router.post('/signin', function(req, res){
         if (null == result) {
           console.log("USERNAME NOT FOUND:", userName);
           res.render("signin", { title: 'Username not found. please Sign in again, LH.' });
-          //deferred.resolve(false);
         }
         else {
-          //var hash = result.password;
-
           console.log("FOUND USER: " + result.username);
           //bcrypt.compareSync(userpw, hash)
           if (userpw == result.password) {
@@ -191,26 +133,21 @@ router.post('/signin', function(req, res){
               + ' You may now access <a href="/restricted">/restricted</a>.';
             res.redirect('/lighthouse');
             });
-            //deferred.resolve(result);
           } else {
             console.log("AUTHENTICATION FAILED");
             res.render("signin", { title: 'Wrong username or password. please Sign in again.'});
-            //deferred.resolve(false);
           }
         }
         db.close();
       });
-    });
-
-router.get('/lh',restrict,function(req, res){
-  res.send(req.session.user);
-});   
+    });  
            
-/* GET New User page. */
+/* sign up */
 router.get('/signup', function(req, res) {
     res.render('signup', { title: 'Sign up for LightHouse!' });
 });
 
+/* the page for what's up */
 router.get('/prate',restrict, function(req, res) {
     res.render('prate');
 });
@@ -237,7 +174,6 @@ router.post('/signup', function(req, res){
         if (null != result) {
           console.log("USERNAME ALREADY EXISTS:", result.username);
           res.render('signup', { title: 'Username already exists, please try another one.' });
-          //deferred.resolve(false); // username exists
         }
         else  {
           if (/image/.exec(sampleFile.mimetype)==null){
@@ -245,14 +181,12 @@ router.post('/signup', function(req, res){
             res.render('signup', {title:'Please upload a image.'})
           }
           else{
-          //var hash = bcrypt.hashSync(userpw, 8);
           var user = {
                      "username" : userName,
                       "email" : userEmail,
                       "password" : userpw,
                       "number" : usernum,
                       "file": sampleFile
-            //"avatar": "http://placepuppy.it/images/homepage/Beagle_puppy_6_weeks.JPG"
           }
           console.log("REQ.BODY", req.body)
           console.log("CREATING USER:", userName);
@@ -276,90 +210,12 @@ router.post('/signup', function(req, res){
   console.log("upload file: ",sampleFile); // the uploaded file object 
 });               
 
-//s3
-/* Multer set storage location*/
-var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, './public/TmpImg/');
-  },
-  filename: function (req, file, cb) {
-      cb(null, file.originalname);
-  }
-});
- 
-var upload = multer({ storage: storage });
-// dev.sociogators.files
- 
- 
-router.get('/upload', function(req, res, next) {
-    res.render('upload', {title :'xxx'});
-});
- 
-router.post('/upload', upload.single('sampleFile'),   function(req, res, next) {
-    var s3 = new aws.S3();
-    console.log('xxx'+req.files.sampleFile);
-    s3.upload({
-              "Bucket": "lighthouseuserimg",
-               "Key": req.files.sampleFile.originalname,
-               "Body": fs.createReadStream('./public/TmpImg/'+req.files.sampleFile.originalname)
-            }, function(err, data) {
-            if (err) {
-                console.log("Error uploading data: ", err);
-            } else {
-                    //delete local file
-                    fs.unlinkSync(req.file.path);
-                    console.log(data);
- 
-                    /*
-                    //save image name to database
-                    var img = { link: data['Location'], 
-                                name: req.file.originalname,
-                                diskname: req.file.filename,
-                                created:  Date.now()
-                    };
-                    db.insert(img, function (err, newDoc) {   
-                        // Callback is optional
-                        // newDoc is the newly inserted document, including its _id
-                        // newDoc has no key called notToBeSaved since its value was undefined
-                    });
-                    */
-            }
-        });
- 
-   res.redirect('/upload');
-   
-});
- 
- 
-router.post('/download', function(req, res, next){
-    var s3 = new aws.S3();
-    // console.log(req.body.diskname);
- 
-    var params = {Bucket: 'dev.sociogators.files', Key: req.body.diskname};
- 
-    // console.log(params);
-    // res.attachment(req.body.diskname);
-    s3.getObject(params,
-      function (error, data) {
-        if (error != null) {
-          console.log("Failed to retrieve an object: " + error);
-        } else {
-          console.log("Loaded " + data.ContentLength + " bytes");
-          // do something with data.body
-        }
-      }
-    );
-    // var file = fs.createWriteStream('/public/images/'+req.body.diskname+'');
-    // s3.getObject(params).createReadStream().pipe(file);
- 
-    res.redirect('/upload');
- 
-});
-
+/*recommendation page*/
 router.get('/rec',restrict,function(req,res){
   res.render('rec');
 });
 
+/* this router calls recur function to conmmunicate with Spark via SQS, get the recommendation from Spark */
 router.get('/recimg',function(req,res){
   //sqs
   var u=JSON.stringify({'user':req.session.user});
@@ -373,90 +229,9 @@ router.get('/recimg',function(req,res){
     else     console.log(data);           // successful response
   });
   recur(req,res);
-  /*
-  var receive={
-    QueueUrl: 'https://***REMOVED***',
-    WaitTimeSeconds: 2
-  };
-//  while(1){
-    //console.log('trying');
-    sqs.receiveMessage(receive, function(err, data) {
-      if (err) console.log('err'); // an error occurred
-      else{
-        console.log('receiving');
-        console.log(data);
-        if(data!=undefined){
-          console.log(data['Messages'][0]['Body']);
-          if(data['Messages'][0]['Body']==req.session.user){
-            var del={
-              QueueUrl: 'https://***REMOVED***',
-              ReceiptHandle: data['Messages'][0]['ReceiptHandle']  
-            };
-            sqs.deleteMessage(del,function(err,data){
-              if(err) console.log(err,err.stack);
-              else{
-                console.log(data);
-                console.log('deleted');
-    
-                  //es
-//   conso  le.log(req.session.user);
-                var s_params={
-                  index:'pixabay-predict',
-                  type:req.session.user,
-                  size:5,
-                  body:{
-                    query:{
-                      match_all:{}
-                    }
-                  }
-                };
-                client.search(s_params,function(err,data){
-                if(err){
-                  console.log(err);
-                }
-                else{
-       //   console.log(data['hits']['hits'][0]['_source']["url"]);
-                  res.send(data['hits']['hits'][0]['_source']["url"]);
-                  //break;
-                }
-                });
-                  //es
-              }
-            });
-          }
-        }
-      }           
-    });
- // }
- */
-
-
-/*
- // console.log(req.session.user);
-  var s_params={
-    index:'pixabay-predict',
-    type:req.session.user,
-    size:5,
-    body:{
-      query:{
-        match_all:{}
-      }
-    }
-  };
-  client.search(s_params,function(err,data){
-    if(err){
-      console.log(err);
-    }
-    else{
-     // console.log(data['hits']['hits'][0]['_source']["url"]);
-      res.send(data['hits']['hits'][0]['_source']["url"]);
-    }
-  });
-  */
- // j=[1,2,3];
- // res.send(j);
 });
 
+/* This router is used for collecting user feedback and send the information to Spark */
 router.get('/feedback', function(req, res){
   var feedback=req.query.f;
   var pic_url = req.query.pic_url;
@@ -476,23 +251,6 @@ router.get('/feedback', function(req, res){
       }
       labels=labels.substring(0,labels.length-1);
       console.log(labels);
-      /*  
-      var fb={
-        'feedback':feedback,
-        'labels':labels,
-        'user':req.session.user
-      };
-      console.log(fb);
-      //to mongodb
-      collection.insert(fb,function(err,doc){
-        if (err){
-          console.log("There was a problem adding the information to the database.");
-        }
-        else {
-        console.log('updated!');
-        }
-      });
-      */
 //sqs
       var dic={
         "label":Number(feedback),
@@ -505,50 +263,15 @@ router.get('/feedback', function(req, res){
       var params={
         MessageBody: dic_2, 
         QueueUrl: 'https://sqs.us-west-2.amazonaws.com/145842502534/nofeedback', 
-        MessageAttributes: {
-          "label": {
-          DataType: "String", 
-          StringValue: feedback
-          },
-          "tags": {
-          DataType: "String", 
-          StringValue: labels
-          },
-          "user": {
-          DataType: "String", 
-          StringValue: req.session.user
-          }
-        }
       };
-      
       sqs.sendMessage(params, function(err, data) {
         if (err) console.log(err, err.stack); // an error occurred
         else     console.log(data);           // successful response
       });
-
     },
     function(err) {
        console.error(err);
-       // there was an error
-    }
-  );
-/*
-  var fb={
-    'feedback':feedback,
-    'labels':labels
-  };
-  console.log(fb);
-  //to mongodb
-  collection.insert(fb,function(err,doc){
-    if (err){
-      console.log("There was a problem adding the information to the database.");
-    }
-    else {
-    console.log('updated!');
-    }
-  });
-*/
-//to s3  
+    }); 
 });
 
 module.exports = router;
