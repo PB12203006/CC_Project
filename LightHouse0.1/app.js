@@ -33,12 +33,11 @@ var chatname = index.chatname;
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(session({secret: 'secret',saveUninitialized: true,resave: true}));
+
 
 // Configuration for Twilio API, which requires several Keys and SIDs and these can be found/ created on the online console
 app.get('/config', function(request, response) {
@@ -137,40 +136,6 @@ var client = new Twilio(process.env.TWILIO_API_KEY,  process.env.TWILIO_API_SECR
     });
   });
 });
-app.post('/send-notification', function(request, response) {
-
-  // Authenticate with Twilio
-  var client = new Twilio(process.env.TWILIO_API_KEY,  process.env.TWILIO_API_SECRET, null, {accountSid:process.env.TWILIO_ACCOUNT_SID});
-
-  // Create a reference to the user notification service
-  var service = client.notify.v1.services(process.env.TWILIO_NOTIFICATION_SERVICE_SID);
-
-  // Send a notification
-  service.notifications.create({
-    'identity':'' + request.body.identity,
-    'body':'Hello, ' + request.body.identity + '!'
-  }).then(function(message) {
-    console.log(message);
-    response.send({
-      message:'Successful sending notification'
-    });
-  }).catch(function(error) {
-    var message = 'Failed to send notification: ' + error;
-    console.log(message);
-    // Send a JSON response indicating an internal server error
-    response.status(500).send({
-      error: error,
-    });
-  });
-});
-
-// Besides running on port 8081, we also set a port at 3002 for testing purpose
-var server = http.createServer(app);
-var port = process.env.PORT || 3002;
-server.listen(port, function() {
-    console.log('Express server running on *:' + port);
-});
-//
 
 //test session
 app.use(session({
@@ -201,14 +166,10 @@ app.use(function(req,res,next){
     next();
 });
 
+
 app.use('/', index);
 app.use('/users', users);
 
-// Was used to direct user to signin page but 
-app.get("/", function(req, res){
-    var title="Welcome";
-    res.render("signin.ejs", {title : title});
-});
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
