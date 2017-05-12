@@ -56,15 +56,10 @@
         <script>
             var data=[];
             var ind=0;
+            //initially get a list of images' urls from server using router /recimg
             $.getJSON('/recimg', function(json){
                 console.log(json);
                 data=json;
-                /*
-                for(var key in json){
-                    data.push(json[key]);
-                }
-                console.log(data);
-                */
                 display(0)
             });
             function display(index){

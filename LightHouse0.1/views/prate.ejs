@@ -78,11 +78,13 @@
             }
             return getImageUrl(photo, '');
         }
+        //initially get a list of pictures
         $.getJSON(url, function(json){
             console.log(json.photos.photo[0]);
             data=json.photos.photo;
             display(0)
                 });
+        //display the image in the list of the specified index
         function display(index){
             var proto = data[index];
             if (proto==undefined){
@@ -102,6 +104,7 @@
             $("#results").append(pc);
             }
         }
+        //when user clicks, pass feedback using router /feedback
         function feedback(){
             var f=$('input[name=img]:checked').val();
             console.log(f);
