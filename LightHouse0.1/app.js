@@ -10,9 +10,7 @@ var pug = require('pug');
 // Chatroom dependency
 var Twilio = require('twilio');
 var AccessToken = Twilio.jwt.AccessToken;
-var VideoGrant = AccessToken.VideoGrant;
 var IpMessagingGrant = AccessToken.IpMessagingGrant;
-var SyncGrant = AccessToken.SyncGrant;
 require('dotenv').load();
 
 
@@ -66,14 +64,6 @@ app.get('/token', function(request, response) {
 
     // Assign the generated identity to the token
     token.identity = request.session.user;
-    //grant the access token Twilio Video capabilities
-    if (process.env.TWILIO_CONFIGURATION_SID) {
-        var videoGrant = new VideoGrant({
-          room: 'default room'
-        });
-
-        token.addGrant(videoGrant);
-    }
 
     if (process.env.TWILIO_CHAT_SERVICE_SID) {
         // Create a unique ID for the client on their current device
@@ -85,19 +75,6 @@ app.get('/token', function(request, response) {
         });
         token.addGrant(ipmGrant);
     }
-
-    if (process.env.TWILIO_SYNC_SERVICE_SID) {
-        // Create a unique ID for the client on their current device
-        var appName = 'TwilioSyncDemo';
-
-        // Create a "grant" which enables a client to use Sync as a given user,
-        // on a given device
-        var syncGrant = new SyncGrant({
-            serviceSid: process.env.TWILIO_SYNC_SERVICE_SID
-        });
-        token.addGrant(syncGrant);
-    }
-
     // Serialize the token to a JWT string and include it in a JSON response
     response.send({
         identity: token.identity,
