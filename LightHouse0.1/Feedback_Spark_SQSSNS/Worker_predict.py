@@ -46,7 +46,7 @@ class workerthread():
                 model.load("models/"+user+".json",average=True)
             except Exception,e:
                 pass
-            response = requests.get("https://pixabay.com/api/?key=5321184-68d88d45c3c32345d8c6768c7&image_type=photo&order=latest&per_page=200").json()
+            response = requests.get("https://pixabay.com/api/?key=5321184-68d88d45c3c32345d8c6768c7&image_type=photo&order=popular&per_page=200").json()
             results = response["hits"]
             print len(results)
             doc=[]
