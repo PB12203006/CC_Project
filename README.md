@@ -11,4 +11,5 @@ Note:
 If you run the server locally, please go to localhost:8081/lighthouse  
 To access our web app on the cloud, please email yj2425@columbia.edu or hm2689@columbia.edu so we will start the VM.  
 Then go to http://sample-env.zxjhw3ptdv.us-west-2.elasticbeanstalk.com/signin.  
-Sorry for the inconvience we just can't afford to keep it running all the time.
+Sorry for the inconvience we just can't afford to keep it running all the time.  
+Project demo was posted at https://www.youtube.com/watch?v=XUn1C3pKy_A&app=desktop.  
