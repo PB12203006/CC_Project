@@ -40,7 +40,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(session({secret: 'secret',saveUninitialized: true,resave: true}));
 
-//
+// Configuration for Twilio API, which requires several Keys and SIDs and these can be found/ created on the online console
 app.get('/config', function(request, response) {
   response.json( {
     TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID,
@@ -53,6 +53,7 @@ app.get('/config', function(request, response) {
   });
 });
 
+// Pass the javascript session's user parameter to the token identity of the chatroom when creating a new AccessToken
 app.get('/token', function(request, response) {
     console.log(request.session.user);
     console.log(`token identity: ${request.session.user}`)
@@ -65,7 +66,7 @@ app.get('/token', function(request, response) {
     );
 
     // Assign the generated identity to the token
-    token.identity = request.session.user;//randomUsername();
+    token.identity = request.session.user;
     //grant the access token Twilio Video capabilities
     if (process.env.TWILIO_CONFIGURATION_SID) {
         var videoGrant = new VideoGrant({
@@ -104,6 +105,7 @@ app.get('/token', function(request, response) {
         token: token.toJwt()
     });
 });
+// Bind Twilio endpoint with a local client
 app.post('/register', function(request, response) {
 
   // Authenticate with Twilio
@@ -161,6 +163,8 @@ app.post('/send-notification', function(request, response) {
     });
   });
 });
+
+// Besides running on port 8081, we also set a port at 3002 for testing purpose
 var server = http.createServer(app);
 var port = process.env.PORT || 3002;
 server.listen(port, function() {
@@ -200,7 +204,7 @@ app.use(function(req,res,next){
 app.use('/', index);
 app.use('/users', users);
 
-
+// Was used to direct user to signin page but 
 app.get("/", function(req, res){
     var title="Welcome";
     res.render("signin.ejs", {title : title});
