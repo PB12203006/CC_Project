@@ -18,7 +18,7 @@ require('dotenv').load();
 var mongo = require('mongodb');
 var monk = require('monk');
 //var mongoose = require('mongoose');
-var db = monk('mongodb://baxia_lan:***REMOVED***@clustercc-shard-00-00-hfapv.mongodb.net:27017,clustercc-shard-00-01-hfapv.mongodb.net:27017,clustercc-shard-00-02-hfapv.mongodb.net:27017/lighthouse?ssl=true&replicaSet=ClusterCC-shard-0&authSource=admin');
+var db = monk('mongodb://baxia_lan:*@clustercc-shard-00-00-hfapv.mongodb.net:27017,clustercc-shard-00-01-hfapv.mongodb.net:27017,clustercc-shard-00-02-hfapv.mongodb.net:27017/lighthouse?ssl=true&replicaSet=ClusterCC-shard-0&authSource=admin');
 var fileUpload = require('express-fileupload');
 
 var index = require('./routes/index');
