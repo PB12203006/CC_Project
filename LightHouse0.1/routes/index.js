@@ -9,17 +9,17 @@ AWS.config.update({region:'us-west-2'});
 var sqs = new AWS.SQS();
 var session = require('express-session');
 var es = require('elasticsearch');
-var connection_str='https://***REMOVED***.us-east-1.es.amazonaws.com';
+var connection_str='https://*.us-east-1.es.amazonaws.com';
 var client = new es.Client({
-    host:'https://***REMOVED***.us-east-1.es.amazonaws.com'
+    host:'*.es.amazonaws.com'
 });
 
 
 //this API is for recognizing pictures
 var Clarifai = require('clarifai');
 var Clarifai_app = new Clarifai.App(
-        '***REMOVED***',
-        '***REMOVED***'
+        '*',
+        '*'
         );
 
 //this function is for maintaining the login session
@@ -35,7 +35,7 @@ function restrict(req, res, next) {
 //this function recursively receives messages from sqs until getting a message corresponding to the specific user it requires
 function recur(req,res){
     var receive={
-        QueueUrl: 'https://***REMOVED***',
+        QueueUrl: '*/sparkfeedback',
         WaitTimeSeconds: 2
     };
     sqs.receiveMessage(receive, function(err, data) {
@@ -49,7 +49,7 @@ function recur(req,res){
                 console.log(body);
                 if(body['user']==req.session.user){
                     var del={
-                        QueueUrl: 'https://***REMOVED***',
+                        QueueUrl: '*/sparkfeedback',
         ReceiptHandle: data['Messages'][0]['ReceiptHandle']  
                     };
                     sqs.deleteMessage(del,function(err,data){
@@ -277,7 +277,7 @@ router.get('/recimg',function(req,res){
     var u=JSON.stringify({'user':req.session.user});
     var params={
         MessageBody: u, 
-    QueueUrl: 'https://sqs.us-west-2.amazonaws.com/145842502534/lighthouseusername', 
+    QueueUrl: '*/lighthouseusername', 
     };
 
     sqs.sendMessage(params, function(err, data) {
@@ -318,7 +318,7 @@ router.get('/feedback', function(req, res){
             console.log(dic_2);
             var params={
                 MessageBody: dic_2, 
-                QueueUrl: 'https://sqs.us-west-2.amazonaws.com/145842502534/nofeedback', 
+                QueueUrl: '*/nofeedback', 
             };
             sqs.sendMessage(params, function(err, data) {
                 if (err) console.log(err, err.stack); // an error occurred
